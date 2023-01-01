@@ -1,6 +1,6 @@
 {
   "name": "api-validation-helper",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Checks the API request and response",
   "main": "index.js",
   "scripts": {
