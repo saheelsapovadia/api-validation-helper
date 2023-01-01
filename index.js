@@ -3,6 +3,13 @@ class RequestBodyCheck {
     this.apiJSON = apiJSONDoc;
   }
 
+  /**
+   * check for types
+   *
+   * @param  {req} req
+   * @param  {res} res
+   * @return {function} next
+   */
   requestBodyCheck = (req, res, next) => {
     try {
       if (this.apiJSON == undefined) throw new Error("api.json file not found");
@@ -12,10 +19,12 @@ class RequestBodyCheck {
       )[0].responsePayload;
       let missingFields = [];
       for (let i = 0; i < fields.length; i++) {
-        if (fields[i] in req.body) {
-          console.log(typeof JSON.parse(req.body[fields[i]]));
-        } else {
-          missingFields.push(fields[i]);
+        let { field, typeCheck, type } = fields[i];
+        if (
+          !(field in req.body) ||
+          (typeCheck && !this.checkType(type, req.body[field]))
+        ) {
+          missingFields.push(field);
           validRequestFlag = false;
         }
       }
@@ -29,5 +38,29 @@ class RequestBodyCheck {
       return res.status(400).send("api.json file not found in the server");
     }
   };
+
+  /**
+   * check for types
+   *
+   * @param  {String} type
+   * @param  {any} value
+   * @return {Boolean}
+   */
+  checkType(type, value) {
+    switch (type) {
+      case "string": {
+        return type == typeof JSON.parse(value);
+      }
+      case "number": {
+        return type == typeof JSON.parse(value);
+      }
+      case "array": {
+        return Array.isArray(JSON.parse(value));
+      }
+      default: {
+        return false;
+      }
+    }
+  }
 }
 module.exports = RequestBodyCheck;
